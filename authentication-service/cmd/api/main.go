@@ -14,8 +14,6 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-// authentication-service is file name and go mod I created. If ı init that with another name it will be to use that name.
-
 const webPort = "80"
 
 var counts int64
@@ -28,11 +26,10 @@ type Config struct {
 func main() {
 	log.Println("Starting authentication service")
 
-	// TODO connect to DB
-
+	// connect to DB
 	conn := connectToDB()
 	if conn == nil {
-		log.Panic("can't connect to Postgres!")
+		log.Panic("Can't connect to Postgres!")
 	}
 
 	// set up config
@@ -42,7 +39,7 @@ func main() {
 	}
 
 	srv := &http.Server{
-		Addr:    fmt.Sprint(":%s", webPort),
+		Addr:    fmt.Sprintf(":%s", webPort),
 		Handler: app.routes(),
 	}
 
@@ -52,18 +49,18 @@ func main() {
 	}
 }
 
-func openDB(dsn string) (*sql.DB, error) { // dsn is connection string for db
+func openDB(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		return nil, err
 	}
+
 	err = db.Ping()
 	if err != nil {
 		return nil, err
 	}
 
 	return db, nil
-
 }
 
 func connectToDB() *sql.DB {
@@ -72,10 +69,10 @@ func connectToDB() *sql.DB {
 	for {
 		connection, err := openDB(dsn)
 		if err != nil {
-			log.Println("Postgres is not ready yet")
+			log.Println("Postgres not yet ready ...")
 			counts++
 		} else {
-			log.Println("Connected to Postgres")
+			log.Println("Connected to Postgres!")
 			return connection
 		}
 
@@ -84,7 +81,7 @@ func connectToDB() *sql.DB {
 			return nil
 		}
 
-		log.Println("Back off 2 seconds")
+		log.Println("Backing off for two seconds....")
 		time.Sleep(2 * time.Second)
 		continue
 	}
